@@ -1,4 +1,25 @@
 import streamlit as st
+
+# --- LOGIN WALA TAALA ---
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+if not st.session_state.logged_in:
+    st.title("🔒 Hari Jewellers - Login")
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+    
+    if st.button("Login"):
+        if username == st.secrets["USERNAME"] and password == st.secrets["PASSWORD"]:
+            st.session_state.logged_in = True
+            st.rerun()
+        else:
+            st.error("Galat Username ya Password hai")
+    st.stop()
+
+if st.sidebar.button("Logout"):
+    st.session_state.logged_in = False
+    st.rerun()import streamlit as st
 import pandas as pd
 import os
 from datetime import date, datetime
