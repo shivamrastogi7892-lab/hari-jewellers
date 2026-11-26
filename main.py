@@ -19,7 +19,7 @@ if not st.session_state.logged_in:
 
 if st.sidebar.button("Logout"):
     st.session_state.logged_in = False
-    st.rerun()import streamlit as st
+    st.rerun()
 import pandas as pd
 import os
 from datetime import date, datetime
