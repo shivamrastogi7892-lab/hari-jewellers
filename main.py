@@ -531,6 +531,7 @@ elif menu == "🏭 Wholesale Entry":
         aayi_percent=st.number_input("Hamari Aayi % * (Sirf Aapko Dikhega)", min_value=0.0, max_value=100.0, value=70.0, step=1.0)
         diya_percent=st.number_input("Dukandaar ko Diya % *", min_value=0.0, max_value=100.0, value=74.0, step=1.0)
     rate_10g=st.number_input("Rate ₹ / 10 gram * (Dashboard se auto)", min_value=0.0, step=100.0, value=float(get_default_rate_10g(metal)), key=f"ws_rate_{metal}")
+    ws_making = st.number_input("Making ₹ (Parcha me jodega)", min_value=0.0, step=10.0, value=0.0, key="ws_making")
     rate = rate_10g / 10.0
     remarks=st.text_input("Remarks - Jaise PC 70, Piece, Kari etc. Yahan likho", key="ws_remarks")
     pakka_wt = net_wt * diya_percent / 100
