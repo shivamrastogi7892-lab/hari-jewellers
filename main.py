@@ -806,7 +806,8 @@ elif menu == "✏️ Entry Edit / Delete":
                 if row["BillType"]=="Kaccha":
                     new_sub = e_rate * e_percent / 100; new_total = new_sub; new_gst_amt = 0
                 else:
-                    new_sub = e_weight * e_percent / 100 * e_rate / 10; new_gst_amt = new_sub * e_gst / 100; new_total = new_sub + new_gst_amt + e_making                st.markdown(f"**Naya Total:** ₹ {new_total:,.0f}")
+                    new_sub = e_weight * e_percent / 100 * e_rate / 10; new_gst_amt = new_sub * e_gst / 100; new_total = new_sub + new_gst_amt + e_making                
+                    st.markdown(f"**Naya Total:** ₹ {new_total:,.0f}")
                 col1, col2 = st.columns(2)
                 with col1:
                     if st.button("💾 Save Changes - Sale Update Karo", key="save_sl"):
