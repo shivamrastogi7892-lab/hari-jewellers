@@ -78,13 +78,21 @@ div[data-testid="stSidebar"] * { color: white !important; }
 """, unsafe_allow_html=True)
 
 def fetch_24k_live():
-    if requests is None: return None
     try:
-        g = requests.get("https://data-asg.goldprice.org/dbXRates/USD", timeout=6).json()
-        usd_inr = requests.get("https://open.er-api.com/v6/latest/USD", timeout=6).json()["rates"]["INR"]
-        per_gm = (float(g["items"][0]["curr"]) / 31.1035) * float(usd_inr)
-        return round(per_gm * 10, 2)
-    except: return None
+        headers = {"User-Agent": "Mozilla/5.0"}
+        r1 = requests.get("https://query1.finance.yahoo.com/v8/finance/chart/GC=F", headers=headers, timeout=15).json()
+        gold_usd_oz = r1['chart']['result'][0]['meta']['regularMarketPrice']
+        r2 = requests.get("https://open.er-api.com/v6/latest/USD", timeout=15).json()
+        usd_inr = r2['rates']['INR']
+        rate_10g = (gold_usd_oz * usd_inr / 31.1035) * 10
+        return round(rate_10g)
+    except:
+        pass
+    try:
+        r = requests.get("https://api.metals.live/v1/spot?currency=INR", timeout=15).json()
+        return round(float(r[0]['gold']) * 10)
+    except:
+        return None
 
 def get_default_rate(metal):
     if metal == "Gold": return float(st.session_state.get("gold_rate", 72000.0)) / 10.0
