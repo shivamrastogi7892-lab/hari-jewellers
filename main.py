@@ -799,7 +799,7 @@ elif menu == "✏️ Entry Edit / Delete":
                     e_weight = st.number_input("Weight (grams)", value=float(to_num(row["Weight"])), key="e_sl_wt")
                     e_rate = st.number_input("Rate ₹ (Kaccha=Full Value, Pakka=Per Gram)", value=float(to_num(row["Rate"])), key="e_sl_rate")
                 with c3:
-                    e_percent = st.number_input("Percent % (Kaccha ke liye - Customer hamesha 100%)", value=float(to_num(row["Percent"])), key="e_sl_per")
+                    e_making = st.number_input("Making ₹", value=float(to_num(row.get("Making",0))), key="e_sl_making")
                     e_gst = st.number_input("GST % (Pakka ke liye)", value=float(to_num(row["GSTPercent"])), key="e_sl_gst")
                 e_remarks = st.text_input("Remarks", value=str(row["Remarks"]), key="e_sl_rem")
                 if row["BillType"]=="Kaccha":
