@@ -393,8 +393,7 @@ elif menu == "🛍️ New Sale / Billing":
             k_weight=st.number_input("Weight (gram) *", min_value=0.0, step=0.1, key="k_weight")
             # Customer ke liye Percent hamesha 100 - Dukandar wala option hata diya
             k_percent=100.0
-            st.number_input("Percent % (Customer = 100% Fixed)", min_value=0.0, max_value=100.0, value=100.0, step=1.0, key="k_percent_cust", disabled=True)
-        with c3:
+            k_making = st.number_input("Making Charge (₹) - Manually Bharo", min_value=0.0, value=0.0, step=10.0, key="k_making")        with c3:
             k_rate_10g=st.number_input("Rate ₹ / 10 gram *", min_value=0.0, step=100.0, value=float(get_default_rate_10g(k_metal)), key=f"k_rate_{k_metal}")
             k_rate_per_gm = k_rate_10g / 10.0
             k_remarks=st.text_input("Remarks - Jaise PC 70, Piece etc.", key="k_remarks")
