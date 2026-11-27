@@ -401,7 +401,7 @@ elif menu == "🛍️ New Sale / Billing":
         with c4:
             st.write(""); st.write("")
             k_total_value = k_weight * k_rate_per_gm
-            k_amount = k_total_value * k_percent / 100
+            k_amount = k_total_value * k_percent / 100 + k_making
             st.markdown(f"**Full Value:** ₹ {k_total_value:,.0f}")
             st.markdown(f"**Lena Hai:** ₹ {k_amount:,.0f}")
         if k_weight>0 and k_rate_per_gm>0:
