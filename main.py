@@ -413,7 +413,7 @@ elif menu == "🛍️ New Sale / Billing":
                 if k_rate_per_gm<=0: st.error("Rate dalo."); st.stop()
                 if not k_item or k_item.startswith("➕"): st.error("Article select karo."); st.stop()
                 save_new_article(k_metal, k_item)
-                st.session_state["kaccha_cart"].append({"Metal":k_metal,"Item":k_item,"Weight":k_weight,"Percent":k_percent,"Rate":k_total_value,"RatePerGm":k_rate_per_gm,"Rate10g":k_rate_10g,"Amount":k_amount,"Remarks":k_remarks,"BillFor":"Customer"})
+                st.session_state["kaccha_cart"].append({"Metal":k_metal,"Item":k_item,"Weight":k_weight,"Making":k_making,"Rate":k_total_value,"RatePerGm":k_rate_per_gm,"Rate10g":k_rate_10g,"Amount":k_amount,"Remarks":k_remarks,"BillFor":"Customer"})
                 st.success(f"✅ {k_item} Add Ho Gaya! Amount ₹ {k_amount:,.0f}"); st.rerun()
         with col_clear:
             if st.button("🗑️ Cart Clear"):
@@ -421,7 +421,7 @@ elif menu == "🛍️ New Sale / Billing":
         if st.session_state["kaccha_cart"]:
             st.markdown("### 📋 Kaccha Bill - Ab Tak Ke Article")
             cart_df = pd.DataFrame(st.session_state["kaccha_cart"])
-            st.dataframe(cart_df[["Metal","Item","Weight","Rate10g","Percent","Rate","Amount","Remarks"]], use_container_width=True)
+            st.dataframe(cart_df[["Metal","Item","Weight","Rate10g","Making","Rate","Amount","Remarks"]], use_container_width=True)
             total_kaccha = sum(x["Amount"] for x in st.session_state["kaccha_cart"])
             total_wt = sum(x["Weight"] for x in st.session_state["kaccha_cart"])
             st.markdown(f"**Total Articles:** {len(cart_df)} | **Total Weight:** {total_wt:.2f} gm")
