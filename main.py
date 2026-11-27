@@ -84,7 +84,7 @@ def fetch_24k_live():
         gold_usd_oz = r1['chart']['result'][0]['meta']['regularMarketPrice']
         r2 = requests.get("https://open.er-api.com/v6/latest/USD", timeout=15).json()
         usd_inr = r2['rates']['INR']
-        rate_10g = (gold_usd_oz * usd_inr / 31.1035) * 10
+        rate_10g = (gold_usd_oz * usd_inr / 31.1035) * 10 * 1.152
         return round(rate_10g)
     except:
         pass
