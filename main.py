@@ -682,7 +682,7 @@ elif menu == "🧾 Receipt / Print":
                 st.write(f"**{s0['BillType']} Bill** - {bill_no_sel} | {s0['CustomerName']} | Total ₹ {sum(to_num(x) for x in s_df['TotalAmount']):,.0f}")
                 st.dataframe(s_df, use_container_width=True)
                 if s0["BillType"]=="Pakka":
-                    body=f"<p><b>Bill No:</b> {bill_no_sel} | <b>Customer:</b> {s0['CustomerName']}</p><table><tr><th>Item</th><th>Weight</th><th>Rate</th><th>Total</th></tr><tr><td>{s0['Metal']} - {s0['Item']}</td><td>{s0['Weight']} gm</td><td>₹ {to_num(s0['Rate'])*10:,.0f} /10gm</td><td>₹ {to_num(s0['TotalAmount']):,.0f}</td></tr></table><div class='total'>Total: ₹ {to_num(s0['TotalAmount']):,.0f}</div>"
+                    body=f"<p><b>Bill No:</b> {bill_no_sel} | <b>Customer:</b> {s0['CustomerName']}</p><table><tr><th>Item</th><th>Weight</th><th>Rate</th><th>Making</th><th>Total</th></tr><tr><td>{s0['Metal']} - {s0['Item']}</td><td>{s0['Weight']} gm</td><td>₹ {to_num(s0['Rate'])*10:,.0f} /10gm</td><td>₹ {to_num(s0['TotalAmount']):,.0f}</td></tr></table><div class='total'>Total: ₹ {to_num(s0['TotalAmount']):,.0f}</div>"
                     html=make_print_html("TAX INVOICE - PAKKA BILL", body, bill_no_sel, is_pakka=True); download_print_button("🖨️ PAKKA BILL PRINT KARO", html, f"Pakka_{bill_no_sel}.html")
                 else:
                     rows = "".join([f"<tr><td>{i+1}</td><td>{r['Metal']} - {r['Item']}</td><td>{r['Weight']} gm</td><td>{r['Percent']}%</td><td>₹ {to_num(r['Rate']):,.0f}</td><td>₹ {to_num(r['TotalAmount']):,.0f}</td></tr>" for i,(_,r) in enumerate(s_df.iterrows())])
