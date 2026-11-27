@@ -7,7 +7,7 @@ def get_live_rate():
         gold_usd_oz = r1['items'][0]['curr']
         r2 = requests.get("https://open.er-api.com/v6/latest/USD", timeout=10).json()
         usd_inr = r2['rates']['INR']
-        rate_10g_24k = (gold_usd_oz * usd_inr / 31.1035) * 10
+        rate_10g_24k = (gold_usd_oz * usd_inr / 31.1035) * 10 * 1.17
         return round(rate_10g_24k), round(rate_10g_24k * 0.9167)
     except:
         return None, None
