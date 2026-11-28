@@ -260,7 +260,7 @@ if menu == "🏠 Dashboard":
     with c2:
         st.write("24K hi Gold ka rate hai, isi se sab Parcha banega")
     with c3:
-    st.write("")
+        st.write("")
         if st.button("🔄 24K Live Lao", key="fetch_24k"):
             live = fetch_24k_live()
             if live:
