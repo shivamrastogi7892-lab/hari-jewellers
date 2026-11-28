@@ -254,10 +254,11 @@ if menu == "🏠 Dashboard":
     st.markdown("### 📈 Aaj Ka Rate - 10 Gram Me Dalo")
     c1, c2, c3 = st.columns([2,2,1])
     with c1:
-        st.session_state.gold_rate = st.number_input("Gold Rate ₹ / 10 gram * (Manual)", value=float(st.session_state.gold_rate), step=100.0, key="dash_gold")
-        st.caption(f"= ₹ {st.session_state.gold_rate/10:,.0f} / gram")
+                st.session_state.gold_24k = st.number_input("Gold 24K ₹ / 10 gram (Live / Manual)", value=float(st.session_state.gold_24k), step=100.0, key="dash_24k")
+        st.session_state.gold_rate = st.session_state.gold_24k
+        st.caption(f"= ₹ {st.session_state.gold_24k/10:,.0f} / gram")
     with c2:
-        st.session_state.gold_24k = st.number_input("Gold 24K ₹ / 10 gram (Auto / Manual)", value=float(st.session_state.gold_24k), step=100.0, key="dash_24k")
+        st.write("24K hi Gold ka rate hai, isi se sab Parcha banega")
     with c3:
         st.write("")
         if st.button("🔄 24K Live Lao", key="fetch_24k"):
