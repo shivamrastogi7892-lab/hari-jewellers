@@ -53,7 +53,7 @@ DEFAULT_SILVER = ["Payal","Pajeb","Bichhiya","Kardhani","Coin","Glass","Katori",
 CUSTOMER_COLS = ["CustomerID","CustomerName","Mobile","Address","Aadhaar","CreatedDate"]
 GIRVI_COLS = ["GirviID","CustomerID","CustomerName","Mobile","Metal","Item","Weight","LoanAmount","InterestRate","EntryDate","ReleaseDate","Remarks","Status","InterestAmount","TotalReturn"]
 SALE_COLS = ["SaleID","BillNo","BillType","CustomerID","CustomerName","Mobile","Metal","Item","Weight","Rate","Making","SubTotal","GSTPercent","GSTAmount","TotalAmount","PaymentMode","SaleDate","Remarks"]
-WHOLESALE_COLS = ["WholesaleID","ParchaNo","CustomerID","CustomerName","Mobile","Metal","Item","Weight","KacchaWeight","NetWeight","PakkaWeight","Rate","AayiPercent","DiyaPercent","CostAmount","SaleAmount","Profit","EntryTime","Date","Status","Remarks"]
+WHOLESALE_COLS = ["WholesaleID","ParchaNo","CustomerID","CustomerName","Mobile","Metal","Item","Weight","KacchaWeight","NetWeight","PakkaWeight","Rate","AayiPercent","DiyaPercent","Making","CostAmount","SaleAmount","Profit","EntryTime","Date","Status","Remarks"]
 ARTICLE_COLS = ["Metal","Item"]
 
 st.markdown("""
