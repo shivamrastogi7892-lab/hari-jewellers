@@ -686,7 +686,7 @@ elif menu == "🧾 Receipt / Print":
                 else:
                     rows = "".join([f"<tr><td>{i+1}</td><td>{r.get('Metal','')} - {r.get('Item','')}</td><td>{r.get('Weight',0)} gm</td><td>{r.get('Percent', r.get('GSTPercent',0))}%</td><td>₹ {to_num(r.get('Rate',0)):,.0f}</td><td>₹ {to_num(r.get('Making',0)):,.0f}</td><td>₹ {to_num(r.get('TotalAmount', r.get('SubTotal',0))):,.0f}</td></tr>" for i,(_,r) in enumerate(s_df.iterrows())])
                     total_k = sum(to_num(x) for x in s_df.get('TotalAmount', s_df.get('SubTotal', [0])))
-                    body = f"<p><b>Customer:</b> {cust['CustomerName']} | <b>Mobile:</b> {cust['Mobile']} | <b>Date:</b> {sel_date}</p><p><b>Gold Rate:</b> ₹ {gold_rate_10:,.0f} / 10gm | <b>Silver Rate:</b> ₹ {silver_rate_10:,.0f} / 10gm</p><table><tr><th>Time</th><th>Item</th><th>Kaccha Wt</th><th>Net Wt</th><th>Percent</th><th>Pakka Wt</th><th>Making</th><th>Remarks</th></tr>{rows_html}</table><table>{bottom_html}</table><p><b>Total Pakka:</b> Gold {gold_pakka:.2f} gm + Silver {silver_pakka:.2f} gm</p><div class='total'>Grand Total: ₹ {total_sale:,.0f}</div>"
+                    body = f"<p><b>Bill No:</b> {bill_no_sel} | <b>Customer:</b> {s0['CustomerName']} ({s0['Mobile']}) | <b>Date:</b> {s0['SaleDate']}</p><table><tr><th>S.No</th><th>Article</th><th>Weight</th><th>Percent</th><th>Rate</th><th>Making</th><th>Amount</th></tr>{rows}</table><div class='total'>Grand Total: ₹ {total_k:,.0f}</div>"
                     html=make_print_html("KACCHA BILL", body, bill_no_sel, is_pakka=False); download_print_button("🖨️ KACCHA BILL PRINT KARO", html, f"Kaccha_{bill_no_sel}.html")
         else: st.info("Koi Sale nahi hai.")
     with tab3:
