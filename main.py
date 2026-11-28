@@ -251,10 +251,10 @@ st.sidebar.markdown("📞 **Shop:** Hari Jewellers")
 if menu == "🏠 Dashboard":
     st.subheader("📊 Aaj Ka Hisab")
     st.markdown('<div class="rate-box">', unsafe_allow_html=True)
-    st.markdown("### 📈 Aaj Ka Rate - 10 Gram Me Dalo")
+        st.markdown("### 📈 Aaj ka Rate - 10 Gram Me Dalo")
     c1, c2, c3 = st.columns([2,2,1])
     with c1:
-                st.session_state.gold_24k = st.number_input("Gold 24K ₹ / 10 gram (Live / Manual)", value=float(st.session_state.gold_24k), step=100.0, key="dash_24k")
+        st.session_state.gold_24k = st.number_input("Gold 24K ₹ / 10 gram (Live / Manual)", value=float(st.session_state.gold_24k), step=100.0, key="dash_24k")
         st.session_state.gold_rate = st.session_state.gold_24k
         st.caption(f"= ₹ {st.session_state.gold_24k/10:,.0f} / gram")
     with c2:
@@ -266,7 +266,7 @@ if menu == "🏠 Dashboard":
             if live:
                 st.session_state.gold_24k = float(live); st.success(f"24K Live: ₹ {live:,.0f} / 10gm"); st.rerun()
             else: st.warning("Net nahi hai. Haath se daal do.")
-        c_s1, c_s2 = st.columns([2,1])
+    c_s1, c_s2 = st.columns([2,1])
     with c_s1:
         st.session_state.silver_rate = st.number_input("Silver Rate ₹ / 10 gram (Live / Manual)", value=float(st.session_state.silver_rate), step=10.0, key="dash_silver")
     with c_s2:
