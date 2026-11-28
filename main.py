@@ -266,8 +266,25 @@ if menu == "🏠 Dashboard":
             if live:
                 st.session_state.gold_24k = float(live); st.success(f"24K Live: ₹ {live:,.0f} / 10gm"); st.rerun()
             else: st.warning("Net nahi hai. Haath se daal do.")
-    st.session_state.silver_rate = st.number_input("Silver Rate ₹ / 10 gram (Manual)", value=float(st.session_state.silver_rate), step=10.0, key="dash_silver")
-    st.caption(f"Silver = ₹ {st.session_state.silver_rate/10:,.0f} / gram")
+        c_s1, c_s2 = st.columns([2,1])
+    with c_s1:
+        st.session_state.silver_rate = st.number_input("Silver Rate ₹ / 10 gram (Live / Manual)", value=float(st.session_state.silver_rate), step=10.0, key="dash_silver")
+    with c_s2:
+        st.write("")
+        if st.button("🔄 Silver Live Lao", key="fetch_silver"):
+            try:
+                import requests as _rq
+                h = {"User-Agent": "Mozilla/5.0"}
+                r1 = _rq.get("https://query1.finance.yahoo.com/v8/finance/chart/SI=F", headers=h, timeout=15).json()
+                silver_usd_oz = r1['chart']['result'][0]['meta']['regularMarketPrice']
+                r2 = _rq.get("https://open.er-api.com/v6/latest/USD", timeout=15).json()
+                usd_inr = r2['rates']['INR']
+                silver_10g = (silver_usd_oz * usd_inr / 31.1035) * 10 * 1.08
+                st.session_state.silver_rate = float(round(silver_10g))
+                st.success(f"Silver Live: ₹ {round(silver_10g):,.0f} / 10gm")
+                st.rerun()
+            except:
+                st.warning("Net nahi hai. Haath se daal do.")
     if st.button("✅ Rate Save Karo - Sab Parchon Me Lagu Karo"):
         st.success(f"Rate save ho gaya! Gold ₹ {st.session_state.gold_rate:,.0f} / 10gm | 24K ₹ {st.session_state.gold_24k:,.0f} / 10gm | Silver ₹ {st.session_state.silver_rate:,.0f} / 10gm")
     st.markdown('</div>', unsafe_allow_html=True); st.write("")
