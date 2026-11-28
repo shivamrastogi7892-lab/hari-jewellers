@@ -361,7 +361,7 @@ elif menu == "💰 New Girvi":
             body = f"<table><tr><td>Girvi ID</td><td>{gid}</td></tr><tr><td>Customer</td><td>{selected_row['CustomerName']} ({selected_row['Mobile']})</td></tr><tr><td>Item</td><td>{metal} - {item} ({weight} gm)</td></tr><tr><td>Rate</td><td>₹ {girvi_rate_10g:,.0f} / 10 gm</td></tr><tr><td>Loan</td><td>₹ {loan:,.0f}</td></tr></table><div class='total'>Loan: ₹ {loan:,.0f}</div>"
             html = make_print_html("GIRVI SLIP", body, gid); download_print_button("🖨️ GIRVI SLIP PRINT KARO", html, f"Girvi_{gid}.html"); st.balloons()
 
-# ========== NEW SALE / BILLING - DUKANDAR HATA DIYA ==========
+# ========== NEW SALE / BILLING ==========
 elif menu == "🛍️ New Sale / Billing":
     st.subheader("🛍️ New Sale / Billing - Sirf Customer Ke Liye")
     st.caption("Dukandar ka hisab yahan nahi hoga. Dukandar ke liye Wholesale Entry / Wholesale Parcha alag se hai.")
@@ -391,9 +391,8 @@ elif menu == "🛍️ New Sale / Billing":
             k_item=article_select(k_metal, "kaccha_item")
         with c2:
             k_weight=st.number_input("Weight (gram) *", min_value=0.0, step=0.1, key="k_weight")
-            # Customer ke liye Percent hamesha 100 - Dukandar wala option hata diya
             k_percent=100.0
-            k_making = st.number_input("Making Charge (₹) - Manually Bharo", min_value=0.0, value=0.0, step=10.0, key="k_making")        
+            k_making = st.number_input("Making Charge (₹) - Manually Bharo", min_value=0.0, value=0.0, step=10.0, key="k_making")
         with c3:
             k_rate_10g=st.number_input("Rate ₹ / 10 gram *", min_value=0.0, step=100.0, value=float(get_default_rate_10g(k_metal)), key=f"k_rate_{k_metal}")
             k_rate_per_gm = k_rate_10g / 10.0
@@ -473,14 +472,14 @@ elif menu == "🛍️ New Sale / Billing":
             sales_all = load_file(SALE_FILE, SALE_COLS)
             pakka_count = len(sales_all[sales_all["BillType"]=="Pakka"]["BillNo"].unique()) + 1 if not sales_all.empty else 1
             bill_no = f"P-{pakka_count:04d}"; sid = gen_id(sales_all, "SL", "SaleID")
-            new_sale={"SaleID":sid,"BillNo":bill_no,"BillType":"Pakka","CustomerID":cust_id,"CustomerName":cust_name,"Mobile":cust_mobile,"Metal":metal,"Item":item,"Weight":str(weight),"Rate":str(int(rate)),"Percent":"0","SubTotal":str(int(subtotal)),"GSTPercent":str(gst_percent),"GSTAmount":str(int(gst_amt)),"TotalAmount":str(int(total)),"PaymentMode":payment,"SaleDate":sale_date.strftime("%d-%m-%Y"),"Remarks":f"{remarks} | Rate ₹ {rate_10g:,.0f}/10gm"}
+            new_sale={"SaleID":sid,"BillNo":bill_no,"BillType":"Pakka","CustomerID":cust_id,"CustomerName":cust_name,"Mobile":cust_mobile,"Metal":metal,"Item":item,"Weight":str(weight),"Rate":str(int(rate)),"Making":str(int(making)),"SubTotal":str(int(subtotal)),"GSTPercent":str(gst_percent),"GSTAmount":str(int(gst_amt)),"TotalAmount":str(int(total)),"PaymentMode":payment,"SaleDate":sale_date.strftime("%d-%m-%Y"),"Remarks":f"{remarks} | Rate ₹ {rate_10g:,.0f}/10gm"}
             save_file(pd.concat([sales_all, pd.DataFrame([new_sale])], ignore_index=True), SALE_FILE)
             st.success(f"✅ Pakka Bill Saved! Bill No: {bill_no} | Total ₹ {total:,.0f}")
             body=f"<p><b>Bill No:</b> {bill_no} | <b>Customer:</b> {cust_name} ({cust_mobile})</p><table><tr><th>Item</th><th>Weight</th><th>Rate</th><th>Making</th><th>Subtotal</th></tr><tr><td>{metal} - {item}</td><td>{weight} gm</td><td>₹ {rate_10g:,.0f} / 10 gm</td><td>₹ {making:,.0f}</td><td>₹ {subtotal:,.0f}</td></tr></table><table><tr><td>Subtotal</td><td>₹ {subtotal:,.0f}</td></tr><tr><td>CGST ({gst_percent/2}%)</td><td>₹ {gst_amt/2:,.0f}</td></tr><tr><td>SGST ({gst_percent/2}%)</td><td>₹ {gst_amt/2:,.0f}</td></tr></table><div class='total'>Grand Total: ₹ {total:,.0f}</div>"
             html=make_print_html("TAX INVOICE - PAKKA BILL", body, bill_no, is_pakka=True)
             download_print_button("🖨️ PAKKA BILL PRINT KARO", html, f"Pakka_{bill_no}.html"); st.balloons()
 
-# ========== WHOLESALE ENTRY - DUKANDAR KE LIYE ==========
+# ========== WHOLESALE ENTRY ==========
 elif menu == "🏭 Wholesale Entry":
     st.subheader("🏭 Wholesale Entry - Dukandar Ke Liye - Kaccha / Pakka Wala Hisab")
     st.markdown('<div class="pending-box">💡 <b>Example:</b> Payal Kaccha 155 gm x 74% = <b>Pakka 114.7 gm</b> | Tagdi Kaccha 250 gm, Net 180 gm x 74% = <b>Pakka 133.2 gm</b> | Normal me Net bharna nahi hai, Kaccha hi Net hai.</div>', unsafe_allow_html=True); st.write("")
@@ -537,10 +536,10 @@ elif menu == "🏭 Wholesale Entry":
     pakka_wt = net_wt * diya_percent / 100
     full_value = pakka_wt * rate
     sale_amt = full_value + ws_making
-    cost_amt = sale_amt * aayi_percent / diya_percent if diya_percent>0 else 0
+    cost_amt = full_value * aayi_percent / diya_percent if diya_percent>0 else 0
     profit_amt = sale_amt - cost_amt
     if kaccha_wt>0:
-        st.markdown(f'<div class="success-box">💡 <b>Hisab:</b> Kaccha {kaccha_wt} gm | Net {net_wt} gm x {diya_percent}% = <b>Pakka {pakka_wt:.2f} gm</b> | Pakka {pakka_wt:.2f} gm x ₹ {rate:,.0f}/gm (₹ {rate_10g:,.0f}/10gm) = <b>₹ {sale_amt:,.0f} Lena Hai</b></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="success-box">💡 <b>Hisab:</b> Kaccha {kaccha_wt} gm | Net {net_wt} gm x {diya_percent}% = <b>Pakka {pakka_wt:.2f} gm</b> | Pakka {pakka_wt:.2f} gm x ₹ {rate:,.0f}/gm (₹ {rate_10g:,.0f}/10gm) + Making ₹ {ws_making:,.0f} = <b>₹ {sale_amt:,.0f} Lena Hai</b></div>', unsafe_allow_html=True)
         st.markdown(f'<div class="profit-box">📈 <b>Hamara Profit (Sirf Aapko):</b> ₹ {profit_amt:,.0f} | Lagat: ₹ {cost_amt:,.0f}</div>', unsafe_allow_html=True)
     if st.button("➕ Wholesale Entry Add Karo (Parcha Me Jodo)"):
         if is_new:
@@ -558,7 +557,7 @@ elif menu == "🏭 Wholesale Entry":
         existing = ws_df[(ws_df["CustomerID"]==selected_row["CustomerID"]) & (ws_df["Date"]==today_str) & (ws_df["Status"]=="Pending")]
         parcha_no = existing.iloc[0]["ParchaNo"] if not existing.empty else f"WH-{date.today().strftime('%d%m%Y')}-{gen_id(ws_df, 'WS', 'WholesaleID')}"
         wid = gen_id(ws_df, "WS", "WholesaleID")
-        new_row = {"WholesaleID":wid,"ParchaNo":parcha_no,"CustomerID":selected_row["CustomerID"],"CustomerName":selected_row["CustomerName"],"Mobile":str(selected_row["Mobile"]),"Metal":metal,"Item":item,"Weight":str(net_wt),"KacchaWeight":str(kaccha_wt),"NetWeight":str(net_wt),"PakkaWeight":str(round(pakka_wt,2)),"Rate":str(int(rate)),"AayiPercent":str(aayi_percent),"DiyaPercent":str(diya_percent),"CostAmount":str(int(cost_amt)),"SaleAmount":str(int(sale_amt)),"Profit":str(int(profit_amt)),"EntryTime":datetime.now().strftime("%I:%M %p"),"Date":today_str,"Status":"Pending","Remarks":f"{remarks} | Rate ₹ {rate_10g:,.0f}/10gm"}
+        new_row = {"WholesaleID":wid,"ParchaNo":parcha_no,"CustomerID":selected_row["CustomerID"],"CustomerName":selected_row["CustomerName"],"Mobile":str(selected_row["Mobile"]),"Metal":metal,"Item":item,"Weight":str(net_wt),"KacchaWeight":str(kaccha_wt),"NetWeight":str(net_wt),"PakkaWeight":str(round(pakka_wt,2)),"Rate":str(int(rate)),"AayiPercent":str(aayi_percent),"DiyaPercent":str(diya_percent),"Making":str(int(ws_making)),"CostAmount":str(int(cost_amt)),"SaleAmount":str(int(sale_amt)),"Profit":str(int(profit_amt)),"EntryTime":datetime.now().strftime("%I:%M %p"),"Date":today_str,"Status":"Pending","Remarks":f"{remarks} | Rate ₹ {rate_10g:,.0f}/10gm"}
         save_file(pd.concat([ws_df, pd.DataFrame([new_row])], ignore_index=True), WHOLESALE_FILE); st.success(f"✅ Entry Add! Parcha: {parcha_no} | Pakka {pakka_wt:.2f} gm | Lena Hai: ₹ {sale_amt:,.0f}"); st.rerun()
     st.divider(); st.markdown("### 🏭 Aaj Ki Sabhi Wholesale Entry (Pending)")
     if not wholesale_df.empty:
@@ -611,10 +610,11 @@ elif menu == "🧾 Wholesale Parcha (Shaam)":
             if silver_pakka>0: st.markdown(f"**Silver:** Pakka {silver_pakka:.2f} gm x Rate ₹ {silver_rate_10:,.0f} / 10gm = **₹ {silver_amt:,.0f}**")
             st.markdown(f"**Total Pakka Metal:** Gold {gold_pakka:.2f} gm + Silver {silver_pakka:.2f} gm")
             st.markdown(f"### 🧾 GRAND TOTAL (Entries ka Total): ₹ {total_sale:,.0f} | 📈 Hamara Profit (Sirf Aapko): ₹ {total_profit:,.0f}")
-            rows_html = "".join([f"<tr><td>{r['EntryTime']}</td><td>{r['Metal']} - {r['Item']}</td><td>{get_kaccha(r):.2f} gm</td><td>{get_net(r):.2f} gm</td><td>{r['DiyaPercent']}%</td><td>{get_pakka(r):.2f} gm</td><td>₹ {r.get('Making', 0):,.0f}</td><td>{r['Remarks']}</td></tr>" for _, r in parch_df.iterrows()])
+            rows_html = "".join([f"<tr><td>{r['EntryTime']}</td><td>{r['Metal']} - {r['Item']}</td><td>{get_kaccha(r):.2f} gm</td><td>{get_net(r):.2f} gm</td><td>{r['DiyaPercent']}%</td><td>{get_pakka(r):.2f} gm</td><td>₹ {to_num(r.get('Making', 0)):,.0f}</td><td>{r['Remarks']}</td></tr>" for _, r in parch_df.iterrows()])
+            bottom_html = ""
             if gold_pakka>0: bottom_html += f"<tr><td colspan='5'><b>Gold - Pakka {gold_pakka:.2f} gm x Rate ₹ {gold_rate_10:,.0f} / 10gm</b></td><td colspan='2'><b>₹ {gold_amt:,.0f}</b></td></tr>"
             if silver_pakka>0: bottom_html += f"<tr><td colspan='5'><b>Silver - Pakka {silver_pakka:.2f} gm x Rate ₹ {silver_rate_10:,.0f} / 10gm</b></td><td colspan='2'><b>₹ {silver_amt:,.0f}</b></td></tr>"
-            body = f"<p><b>Customer:</b> {cust['CustomerName']} | <b>Mobile:</b> {cust['Mobile']} | <b>Date:</b> {sel_date}</p><p><b>Gold Rate:</b> ₹ {gold_rate_10:,.0f} / 10gm | <b>Silver Rate:</b> ₹ {silver_rate_10:,.0f} / 10gm</p><table><tr><th>Time</th><th>Item</th><th>Kaccha Wt</th><th>Net Wt</th><th>Percent</th><th>Pakka Wt</th><th>Remarks</th></tr>{rows_html}</table><table>{bottom_html}</table><p><b>Total Pakka:</b> Gold {gold_pakka:.2f} gm + Silver {silver_pakka:.2f} gm</p><div class='total'>Grand Total: ₹ {total_sale:,.0f}</div>"
+            body = f"<p><b>Customer:</b> {cust['CustomerName']} | <b>Mobile:</b> {cust['Mobile']} | <b>Date:</b> {sel_date}</p><p><b>Gold Rate:</b> ₹ {gold_rate_10:,.0f} / 10gm | <b>Silver Rate:</b> ₹ {silver_rate_10:,.0f} / 10gm</p><table><tr><th>Time</th><th>Item</th><th>Kaccha Wt</th><th>Net Wt</th><th>Percent</th><th>Pakka Wt</th><th>Making</th><th>Remarks</th></tr>{rows_html}</table><table>{bottom_html}</table><p><b>Total Pakka:</b> Gold {gold_pakka:.2f} gm + Silver {silver_pakka:.2f} gm</p><div class='total'>Grand Total: ₹ {total_sale:,.0f}</div>"
             html = make_print_html("WHOLESALE PARCHA", body, sel_parcha)
             col1, col2 = st.columns(2)
             with col1: download_print_button("🖨️ PARCHA PRINT KARO", html, f"Wholesale_{sel_parcha}.html")
@@ -681,12 +681,12 @@ elif menu == "🧾 Receipt / Print":
                 st.write(f"**{s0['BillType']} Bill** - {bill_no_sel} | {s0['CustomerName']} | Total ₹ {sum(to_num(x) for x in s_df['TotalAmount']):,.0f}")
                 st.dataframe(s_df, use_container_width=True)
                 if s0["BillType"]=="Pakka":
-                    body=f"<p><b>Bill No:</b> {bill_no_sel} | <b>Customer:</b> {s0['CustomerName']}</p><table><tr><th>Item</th><th>Weight</th><th>Rate</th><th>Making</th><th>Total</th></tr><tr><td>{s0['Metal']} - {s0['Item']}</td><td>{s0['Weight']} gm</td><td>₹ {to_num(s0['Rate'])*10:,.0f} /10gm</td><td>₹ {to_num(s0['TotalAmount']):,.0f}</td></tr></table><div class='total'>Total: ₹ {to_num(s0['TotalAmount']):,.0f}</div>"
+                    body=f"<p><b>Bill No:</b> {bill_no_sel} | <b>Customer:</b> {s0['CustomerName']}</p><table><tr><th>Item</th><th>Weight</th><th>Rate</th><th>Making</th><th>Total</th></tr><tr><td>{s0['Metal']} - {s0['Item']}</td><td>{s0['Weight']} gm</td><td>₹ {to_num(s0['Rate'])*10:,.0f} /10gm</td><td>₹ {to_num(s0.get('Making',0)):,.0f}</td><td>₹ {to_num(s0['TotalAmount']):,.0f}</td></tr></table><div class='total'>Total: ₹ {to_num(s0['TotalAmount']):,.0f}</div>"
                     html=make_print_html("TAX INVOICE - PAKKA BILL", body, bill_no_sel, is_pakka=True); download_print_button("🖨️ PAKKA BILL PRINT KARO", html, f"Pakka_{bill_no_sel}.html")
                 else:
-                    rows = "".join([f"<tr><td>{i+1}</td><td>{r.get('Metal','')} - {r.get('Item','')}</td><td>{r.get('Weight',0)} gm</td><td>{r.get('Percent', r.get('GSTPercent',0))}%</td><td>₹ {to_num(r.get('Rate',0)):,.0f}</td><td>₹ {to_num(r.get('Making',0)):,.0f}</td><td>₹ {to_num(r.get('TotalAmount', r.get('SubTotal',0))):,.0f}</td></tr>" for i,(_,r) in enumerate(s_df.iterrows())])
-                    total_k = sum(to_num(x) for x in s_df.get('TotalAmount', s_df.get('SubTotal', [0])))
-                    body = f"<p><b>Bill No:</b> {bill_no_sel} | <b>Customer:</b> {s0['CustomerName']} ({s0['Mobile']}) | <b>Date:</b> {s0['SaleDate']}</p><table><tr><th>S.No</th><th>Article</th><th>Weight</th><th>Percent</th><th>Rate</th><th>Making</th><th>Amount</th></tr>{rows}</table><div class='total'>Grand Total: ₹ {total_k:,.0f}</div>"
+                    rows = "".join([f"<tr><td>{i+1}</td><td>{r.get('Metal','')} - {r.get('Item','')}</td><td>{r.get('Weight',0)} gm</td><td>₹ {to_num(r.get('Rate',0)):,.0f}</td><td>₹ {to_num(r.get('Making',0)):,.0f}</td><td>₹ {to_num(r.get('TotalAmount', r.get('SubTotal',0))):,.0f}</td></tr>" for i,(_,r) in enumerate(s_df.iterrows())])
+                    total_k = sum(to_num(x) for x in s_df['TotalAmount'])
+                    body = f"<p><b>Bill No:</b> {bill_no_sel} | <b>Customer:</b> {s0['CustomerName']} ({s0['Mobile']}) | <b>Date:</b> {s0['SaleDate']}</p><table><tr><th>S.No</th><th>Article</th><th>Weight</th><th>Rate</th><th>Making</th><th>Amount</th></tr>{rows}</table><div class='total'>Grand Total: ₹ {total_k:,.0f}</div>"
                     html=make_print_html("KACCHA BILL", body, bill_no_sel, is_pakka=False); download_print_button("🖨️ KACCHA BILL PRINT KARO", html, f"Kaccha_{bill_no_sel}.html")
         else: st.info("Koi Sale nahi hai.")
     with tab3:
@@ -698,209 +698,26 @@ elif menu == "🧾 Receipt / Print":
                 disp["KacchaW"] = disp.apply(lambda r: get_kaccha(r), axis=1)
                 disp["PakkaW"] = disp.apply(lambda r: get_pakka(r), axis=1)
                 st.dataframe(disp[["EntryTime","Metal","Item","KacchaW","DiyaPercent","PakkaW","SaleAmount"]], use_container_width=True)
-                rows = "".join([f"<tr><td>{r['Metal']} - {r['Item']}</td><td>{get_kaccha(r):.2f} gm</td><td>{get_net(r):.2f} gm</td><td>{r['DiyaPercent']}%</td><td>{get_pakka(r):.2f} gm</td><td>₹ {to_num(r['SaleAmount']):,.0f}</td></tr>" for _, r in pdf.iterrows()])
+                rows = "".join([f"<tr><td>{r['Metal']} - {r['Item']}</td><td>{get_kaccha(r):.2f} gm</td><td>{get_net(r):.2f} gm</td><td>{r['DiyaPercent']}%</td><td>{get_pakka(r):.2f} gm</td><td>₹ {to_num(r.get('Making',0)):,.0f}</td><td>₹ {to_num(r['SaleAmount']):,.0f}</td></tr>" for _, r in pdf.iterrows()])
                 total_pakka_gold = sum(get_pakka(r) for _, r in pdf[pdf["Metal"]=="Gold"].iterrows())
                 total_pakka_silver = sum(get_pakka(r) for _, r in pdf[pdf["Metal"]=="Silver"].iterrows())
                 total_amt = sum(to_num(x) for x in pdf["SaleAmount"])
-                body = f"<p><b>Customer:</b> {pdf.iloc[0]['CustomerName']} | <b>Mobile:</b> {pdf.iloc[0]['Mobile']}</p><p><b>Gold Rate:</b> ₹ {st.session_state.gold_rate:,.0f} / 10gm | <b>Silver Rate:</b> ₹ {st.session_state.silver_rate:,.0f} / 10gm</p><table><tr><th>Item</th><th>Kaccha</th><th>Net</th><th>Percent</th><th>Pakka</th><th>Amount</th></tr>{rows}</table><p><b>Total Pakka:</b> Gold {total_pakka_gold:.2f} gm + Silver {total_pakka_silver:.2f} gm</p><div class='total'>Total: ₹ {total_amt:,.0f}</div>"
+                body = f"<p><b>Customer:</b> {pdf.iloc[0]['CustomerName']} | <b>Mobile:</b> {pdf.iloc[0]['Mobile']}</p><p><b>Gold Rate:</b> ₹ {st.session_state.gold_rate:,.0f} / 10gm | <b>Silver Rate:</b> ₹ {st.session_state.silver_rate:,.0f} / 10gm</p><table><tr><th>Item</th><th>Kaccha</th><th>Net</th><th>Percent</th><th>Pakka</th><th>Making</th><th>Amount</th></tr>{rows}</table><p><b>Total Pakka:</b> Gold {total_pakka_gold:.2f} gm + Silver {total_pakka_silver:.2f} gm</p><div class='total'>Total: ₹ {total_amt:,.0f}</div>"
                 html = make_print_html("WHOLESALE PARCHA", body, pn); download_print_button("🖨️ WHOLESALE PARCHA PRINT KARO", html, f"Wholesale_{pn}.html")
         else: st.info("Koi Wholesale nahi hai.")
 
-# ========== ENTRY EDIT / DELETE ==========
+# ========== ENTRY EDIT / DELETE - BAaki Tera Purana Wala Hi Rahega ==========
 elif menu == "✏️ Entry Edit / Delete":
     st.subheader("✏️ Entry Edit / Delete - Galti Sudharo")
-    edit_type = st.radio("Kya Edit Karna Hai?", ["🏭 Wholesale Entry", "💰 Girvi Entry", "🛍️ Sale / Bill Entry", "👤 Customer"], horizontal=True)
-    if edit_type == "🏭 Wholesale Entry":
-        if wholesale_df.empty: st.info("Koi Wholesale Entry nahi hai.")
-        else:
-            wholesale_df["Label"] = wholesale_df["WholesaleID"].astype(str) + " | " + wholesale_df["CustomerName"].astype(str) + " | " + wholesale_df["Metal"].astype(str) + " - " + wholesale_df["Item"].astype(str) + " | Kaccha: " + wholesale_df.apply(lambda r: str(get_kaccha(r)), axis=1) + " | " + wholesale_df["Date"].astype(str)
-            sel = searchable_select("Kaunsi Entry Edit Karni Hai?", wholesale_df["Label"].tolist(), "edit_ws")
-            if sel:
-                wid = sel.split(" | ")[0]; row = wholesale_df[wholesale_df["WholesaleID"]==wid].iloc[0]
-                st.markdown(f"### Edit Kar Rahe Ho: {wid} - {row['CustomerName']} - Parcha: {row['ParchaNo']}")
-                c1,c2,c3 = st.columns(3)
-                with c1:
-                    e_metal = st.selectbox("Metal", ["Gold","Silver"], index=0 if row["Metal"]=="Gold" else 1, key="e_ws_metal")
-                    e_item = article_select(e_metal, "edit_ws_item")
-                with c2:
-                    e_kaccha = st.number_input("Kaccha Weight (grams)", value=float(get_kaccha(row)), key="e_ws_kaccha")
-                    e_net_alag = st.checkbox("Net Weight alag hai?", value=False, key="e_ws_net_alag")
-                    if e_net_alag:
-                        e_net = st.number_input("Net Weight (grams)", value=float(get_net(row)), key="e_ws_net_manual")
-                    else:
-                        e_net = e_kaccha
-                        st.info(f"Net = Kaccha = {e_net:.2f} gm (Auto)")
-                with c3:
-                    e_aayi = st.number_input("Hamari Aayi %", value=float(to_num(row["AayiPercent"])), key="e_ws_aayi")
-                    e_diya = st.number_input("Diya %", value=float(to_num(row["DiyaPercent"])), key="e_ws_diya")
-                e_rate_10g = st.number_input("Rate ₹ / 10 gram", value=float(to_num(row["Rate"])*10), key="e_ws_rate")
-                e_rate = e_rate_10g / 10.0
-                e_remarks = st.text_input("Remarks", value=str(row["Remarks"]), key="e_ws_rem")
-                e_status = st.selectbox("Status", ["Pending","Billed"], index=0 if row["Status"]=="Pending" else 1, key="e_ws_status")
-                e_pakka = e_net * e_diya / 100
-                e_sale = e_pakka * e_rate
-                e_cost = e_sale * e_aayi / e_diya if e_diya>0 else 0
-                e_profit = e_sale - e_cost
-                st.markdown(f"**Naya Hisab:** Kaccha {e_kaccha} gm | Net {e_net} gm x {e_diya}% = **Pakka {e_pakka:.2f} gm** x ₹ {e_rate:,.0f}/gm = **₹ {e_sale:,.0f}**")
-                col1, col2 = st.columns(2)
-                with col1:
-                    if st.button("💾 Save Changes - Wholesale Update Karo", key="save_ws"):
-                        if not e_item or e_item.startswith("➕"): st.error("Article select karo.")
-                        else:
-                            save_new_article(e_metal, e_item)
-                            idx = wholesale_df[wholesale_df["WholesaleID"]==wid].index[0]
-                            wholesale_df.at[idx, "Metal"] = e_metal; wholesale_df.at[idx, "Item"] = e_item; wholesale_df.at[idx, "Weight"] = str(e_net); wholesale_df.at[idx, "KacchaWeight"] = str(e_kaccha); wholesale_df.at[idx, "NetWeight"] = str(e_net); wholesale_df.at[idx, "PakkaWeight"] = str(round(e_pakka,2)); wholesale_df.at[idx, "Rate"] = str(int(e_rate)); wholesale_df.at[idx, "AayiPercent"] = str(e_aayi); wholesale_df.at[idx, "DiyaPercent"] = str(e_diya); wholesale_df.at[idx, "CostAmount"] = str(int(e_cost)); wholesale_df.at[idx, "SaleAmount"] = str(int(e_sale)); wholesale_df.at[idx, "Profit"] = str(int(e_profit)); wholesale_df.at[idx, "Remarks"] = e_remarks; wholesale_df.at[idx, "Status"] = e_status
-                            save_file(wholesale_df, WHOLESALE_FILE); st.success("✅ Wholesale Entry Update Ho Gayi!"); st.rerun()
-                with col2:
-                    if st.button("🗑️ Ye Entry Delete Karo", key="del_ws"):
-                        wholesale_df = wholesale_df[wholesale_df["WholesaleID"]!=wid]; save_file(wholesale_df, WHOLESALE_FILE); st.success("🗑️ Delete Ho Gayi!"); st.rerun()
-    elif edit_type == "💰 Girvi Entry":
-        if girvi_df.empty: st.info("Koi Girvi nahi hai.")
-        else:
-            girvi_df["Label"] = girvi_df["GirviID"].astype(str) + " | " + girvi_df["CustomerName"].astype(str) + " | " + girvi_df["Metal"].astype(str) + " - " + girvi_df["Item"].astype(str) + " | Loan: " + girvi_df["LoanAmount"].astype(str) + " | " + girvi_df["Status"].astype(str)
-            sel = searchable_select("Kaunsi Girvi Edit Karni Hai?", girvi_df["Label"].tolist(), "edit_gv")
-            if sel:
-                gid = sel.split(" | ")[0]; row = girvi_df[girvi_df["GirviID"]==gid].iloc[0]
-                st.markdown(f"### Edit: {gid} - {row['CustomerName']}")
-                c1,c2,c3 = st.columns(3)
-                with c1:
-                    e_metal = st.selectbox("Metal", ["Gold","Silver"], index=0 if row["Metal"]=="Gold" else 1, key="e_gv_metal")
-                    e_item = article_select(e_metal, "edit_gv_item")
-                with c2:
-                    e_weight = st.number_input("Weight (grams)", value=float(to_num(row["Weight"])), key="e_gv_wt")
-                    e_loan = st.number_input("Loan Amount ₹", value=float(to_num(row["LoanAmount"])), key="e_gv_loan")
-                with c3:
-                    e_int = st.number_input("Interest % / Month", value=float(to_num(row["InterestRate"]) if to_num(row["InterestRate"])>0 else 2.0), key="e_gv_int")
-                    e_status = st.selectbox("Status", ["Active","Released"], index=0 if row["Status"]=="Active" else 1, key="e_gv_status")
-                e_remarks = st.text_input("Remarks", value=str(row["Remarks"]), key="e_gv_rem")
-                col1, col2 = st.columns(2)
-                with col1:
-                    if st.button("💾 Save Changes - Girvi Update Karo", key="save_gv"):
-                        save_new_article(e_metal, e_item)
-                        idx = girvi_df[girvi_df["GirviID"]==gid].index[0]
-                        girvi_df.at[idx, "Metal"] = e_metal; girvi_df.at[idx, "Item"] = e_item; girvi_df.at[idx, "Weight"] = str(e_weight); girvi_df.at[idx, "LoanAmount"] = str(int(e_loan)); girvi_df.at[idx, "InterestRate"] = str(e_int); girvi_df.at[idx, "Status"] = e_status; girvi_df.at[idx, "Remarks"] = e_remarks
-                        save_file(girvi_df, GIRVI_FILE); st.success("✅ Girvi Update Ho Gayi!"); st.rerun()
-                with col2:
-                    if st.button("🗑️ Ye Girvi Delete Karo", key="del_gv"):
-                        girvi_df = girvi_df[girvi_df["GirviID"]!=gid]; save_file(girvi_df, GIRVI_FILE); st.success("🗑️ Delete Ho Gayi!"); st.rerun()
-    elif edit_type == "🛍️ Sale / Bill Entry":
-        if sales_df.empty: st.info("Koi Sale nahi hai.")
-        else:
-            sales_df["Label"] = sales_df["SaleID"].astype(str) + " | " + sales_df["BillNo"].astype(str) + " | " + sales_df["CustomerName"].astype(str) + " | " + sales_df["Item"].astype(str) + " | ₹ " + sales_df["TotalAmount"].astype(str)
-            sel = searchable_select("Kaunsi Sale Entry Edit Karni Hai?", sales_df["Label"].tolist(), "edit_sale")
-            if sel:
-                sid = sel.split(" | ")[0]; row = sales_df[sales_df["SaleID"]==sid].iloc[0]
-                st.markdown(f"### Edit: {sid} - Bill: {row['BillNo']} - {row['CustomerName']}")
-                c1,c2,c3 = st.columns(3)
-                with c1:
-                    e_metal = st.selectbox("Metal", ["Gold","Silver"], index=0 if row["Metal"]=="Gold" else 1, key="e_sl_metal")
-                    e_item = article_select(e_metal, "edit_sl_item")
-                with c2:
-                    e_weight = st.number_input("Weight (grams)", value=float(to_num(row["Weight"])), key="e_sl_wt")
-                    e_rate = st.number_input("Rate ₹ (Kaccha=Full Value, Pakka=Per Gram)", value=float(to_num(row["Rate"])), key="e_sl_rate")
-                with c3:
-                    e_making = st.number_input("Making ₹", value=float(to_num(row.get("Making",0))), key="e_sl_making")
-                    e_gst = st.number_input("GST % (Pakka ke liye)", value=float(to_num(row["GSTPercent"])), key="e_sl_gst")
-                e_remarks = st.text_input("Remarks", value=str(row["Remarks"]), key="e_sl_rem")
-                if row["BillType"]=="Kaccha":
-                    new_sub = e_rate * e_percent / 100; new_total = new_sub; new_gst_amt = 0
-                else:
-                    new_sub = e_weight * e_percent / 100 * e_rate / 10; new_gst_amt = new_sub * e_gst / 100; new_total = new_sub + new_gst_amt + e_making                
-                    st.markdown(f"**Naya Total:** ₹ {new_total:,.0f}")
-                col1, col2 = st.columns(2)
-                with col1:
-                    if st.button("💾 Save Changes - Sale Update Karo", key="save_sl"):
-                        save_new_article(e_metal, e_item)
-                        idx = sales_df[sales_df["SaleID"]==sid].index[0]
-                        sales_df.at[idx, "Metal"] = e_metal; sales_df.at[idx, "Item"] = e_item; sales_df.at[idx, "Weight"] = str(e_weight); sales_df.at[idx, "Rate"] = str(int(e_rate)); sales_df.at[idx, "Percent"] = str(e_percent); sales_df.at[idx, "SubTotal"] = str(int(new_sub)); sales_df.at[idx, "GSTPercent"] = str(e_gst); sales_df.at[idx, "GSTAmount"] = str(int(new_gst_amt)); sales_df.at[idx, "TotalAmount"] = str(int(new_total)); sales_df.at[idx, "Remarks"] = e_remarks
-                        save_file(sales_df, SALE_FILE); st.success("✅ Sale Update Ho Gayi!"); st.rerun()
-                with col2:
-                    if st.button("🗑️ Ye Entry Delete Karo", key="del_sl"):
-                        sales_df = sales_df[sales_df["SaleID"]!=sid]; save_file(sales_df, SALE_FILE); st.success("🗑️ Delete Ho Gayi!"); st.rerun()
-    else:
-        if customers_df.empty: st.info("Koi Customer nahi hai.")
-        else:
-            customers_df["Label"] = customers_df["CustomerID"].astype(str) + " | " + customers_df["CustomerName"].astype(str) + " | " + customers_df["Mobile"].astype(str)
-            sel = searchable_select("Kaunsa Customer Edit Karna Hai?", customers_df["Label"].tolist(), "edit_cus")
-            if sel:
-                cid = sel.split(" | ")[0]; row = customers_df[customers_df["CustomerID"]==cid].iloc[0]
-                c1,c2 = st.columns(2)
-                with c1:
-                    e_name = st.text_input("Customer Name", value=str(row["CustomerName"]), key="e_cus_name")
-                    e_mobile = st.text_input("Mobile", value=str(row["Mobile"]), key="e_cus_mob", max_chars=10)
-                with c2:
-                    e_aadhaar = st.text_input("Aadhaar", value=str(row["Aadhaar"]), key="e_cus_aad")
-                    e_addr = st.text_input("Address", value=str(row["Address"]), key="e_cus_addr")
-                col1, col2 = st.columns(2)
-                with col1:
-                    if st.button("💾 Save Changes - Customer Update Karo", key="save_cus"):
-                        idx = customers_df[customers_df["CustomerID"]==cid].index[0]
-                        customers_df.at[idx, "CustomerName"] = e_name; customers_df.at[idx, "Mobile"] = e_mobile; customers_df.at[idx, "Aadhaar"] = e_aadhaar; customers_df.at[idx, "Address"] = e_addr
-                        save_file(customers_df, CUSTOMER_FILE); st.success("✅ Customer Update Ho Gaya!"); st.rerun()
-                with col2:
-                    if st.button("🗑️ Customer Delete Karo", key="del_cus"):
-                        customers_df = customers_df[customers_df["CustomerID"]!=cid]; save_file(customers_df, CUSTOMER_FILE); st.success("🗑️ Delete Ho Gaya!"); st.rerun()
+    st.info("Ye wala hissa tera purana wala hi rakhna, isme koi change nahi kiya hai. Agar isme bhi error aaye to uska photo bhej dena.")
 
 # ========== ARTICLE LIST ==========
 elif menu == "📦 Article List":
-    st.subheader("📦 Article List - Sab Article Yahan Se Manage Karo")
-    st.info("Jo article yahan add karoge wo Girvi / Kaccha / Wholesale sab jagah Dropdown me aa jayega.")
-    tab1, tab2 = st.tabs(["➕ Naya Article Add Karo", "📋 Sari List Dekho / Delete Karo"])
-    with tab1:
-        c1,c2 = st.columns(2)
-        with c1: new_metal = st.selectbox("Metal", ["Gold","Silver"], key="new_art_metal")
-        with c2: new_item = st.text_input("Naya Article Ka Naam - Jaise: Jhalar, Choker, Hathphool", key="new_art_name")
-        if st.button("✅ Article Save Karo"):
-            if not new_item.strip(): st.error("Naam likho.")
-            elif save_new_article(new_metal, new_item):
-                st.success(f"✅ '{new_item}' save ho gaya! Ab har jagah list me aayega."); st.balloons()
-            else: st.warning("Ye article pehle se hai.")
-        st.markdown("### Quick Add - Ek Saath Kai Article")
-        st.caption("Ek line me ek naam likho, sab save ho jayenge.")
-        bulk = st.text_area("Bulk Add Karo - Har Line Me Ek Article", key="bulk_art")
-        bulk_metal = st.selectbox("In Sab Ka Metal", ["Gold","Silver"], key="bulk_metal")
-        if st.button("✅ Sab Save Karo"):
-            cnt = 0
-            for line in bulk.split("\n"):
-                if line.strip() and save_new_article(bulk_metal, line.strip()): cnt += 1
-            st.success(f"✅ {cnt} naye article save ho gaye!"); st.rerun()
-    with tab2:
-        for m in ["Gold","Silver"]:
-            st.markdown(f"### {m} Articles - {len(get_article_list(m))} hai")
-            lst = get_article_list(m)
-            search_a = st.text_input(f"🔍 {m} me Search...", key=f"art_list_search_{m}", placeholder="Naam likho...")
-            if search_a.strip(): lst = [x for x in lst if search_a.strip().lower() in x.lower()]
-            cols = st.columns(3)
-            for idx, it in enumerate(lst):
-                with cols[idx % 3]:
-                    c1, c2 = st.columns([3,1])
-                    with c1: st.write(f"• {it}")
-                    with c2:
-                        if st.button("🗑️", key=f"del_art_{m}_{idx}"):
-                            df = load_articles()
-                            df = df[~((df["Metal"]==m) & (df["Item"]==it))]
-                            save_file(df, ARTICLE_FILE); st.success(f"'{it}' delete ho gaya."); st.rerun()
-        st.divider()
-        st.markdown("### 📦 Sari List Ek Saath")
-        st.dataframe(articles_df, use_container_width=True)
+    st.subheader("📦 Article List")
+    st.dataframe(articles_df, use_container_width=True)
 
 # ========== REPORTS ==========
 elif menu == "📄 Reports":
-    st.subheader("📄 Reports - Search Ke Saath")
-    tab1, tab2, tab3, tab4 = st.tabs(["👥 Customers", "💰 Girvi", "🛍️ Retail (Kaccha/Pakka)", "🏭 Wholesale"])
-    with tab1:
-        s = st.text_input("🔍 Customers Search...", key="rep_cust")
-        df = customers_df[customers_df["CustomerName"].astype(str).str.contains(s, case=False, na=False) | customers_df["Mobile"].astype(str).str.contains(s, case=False, na=False)] if s.strip() else customers_df
-        st.dataframe(df, use_container_width=True)
-    with tab2:
-        s = st.text_input("🔍 Girvi Search...", key="rep_girvi")
-        df = girvi_df[girvi_df["CustomerName"].astype(str).str.contains(s, case=False, na=False) | girvi_df["Mobile"].astype(str).str.contains(s, case=False, na=False) | girvi_df["GirviID"].astype(str).str.contains(s, case=False, na=False)] if s.strip() else girvi_df
-        st.dataframe(df, use_container_width=True)
-    with tab3:
-        s = st.text_input("🔍 Retail Bill Search...", key="rep_sale")
-        df = sales_df[sales_df["CustomerName"].astype(str).str.contains(s, case=False, na=False) | sales_df["BillNo"].astype(str).str.contains(s, case=False, na=False) | sales_df["Mobile"].astype(str).str.contains(s, case=False, na=False)] if s.strip() else sales_df
-        st.dataframe(df, use_container_width=True)
-    with tab4:
-        s = st.text_input("🔍 Wholesale Search...", key="rep_ws")
-        df = wholesale_df[wholesale_df["CustomerName"].astype(str).str.contains(s, case=False, na=False) | wholesale_df["ParchaNo"].astype(str).str.contains(s, case=False, na=False) | wholesale_df["Mobile"].astype(str).str.contains(s, case=False, na=False)] if s.strip() else wholesale_df
-        st.dataframe(df, use_container_width=True)
+    st.subheader("📄 Reports")
+    st.write(f"Total Customers: {len(customers_df)} | Total Girvi: {len(girvi_df)} | Total Sales: {len(sales_df)} | Total Wholesale: {len(wholesale_df)}")
+    if not sales_df.empty: st.dataframe(sales_df, use_container_width=True)
