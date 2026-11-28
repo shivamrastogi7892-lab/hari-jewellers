@@ -258,7 +258,7 @@ if menu == "🏠 Dashboard":
         st.session_state.gold_rate = st.session_state.gold_24k
         st.caption(f"= ₹ {st.session_state.gold_24k/10:,.0f} / gram")
     with c2:
-    st.write("24K hi Gold ka rate hai, isi se sab Parcha banega")
+        st.write("24K hi Gold ka rate hai, isi se sab Parcha banega")
     with c3:
     st.write("")
         if st.button("🔄 24K Live Lao", key="fetch_24k"):
