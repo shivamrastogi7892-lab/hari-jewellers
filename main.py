@@ -536,7 +536,7 @@ elif menu == "🏭 Wholesale Entry":
     remarks=st.text_input("Remarks - Jaise PC 70, Piece, Kari etc. Yahan likho", key="ws_remarks")
     pakka_wt = net_wt * diya_percent / 100
     full_value = pakka_wt * rate
-    sale_amt = full_value
+    sale_amt = full_value + ws_making
     cost_amt = sale_amt * aayi_percent / diya_percent if diya_percent>0 else 0
     profit_amt = sale_amt - cost_amt
     if kaccha_wt>0:
